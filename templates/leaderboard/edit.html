@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Edit: MakersLB{% endblock title %}
+{% block header %}Add/edit{% endblock header %}
+
+{% block body %}
+<form method="post">
+    <div class="form-container">
+        <div class="form-group">
+            <label for="name">Enter name:</label>
+            <input name="name" type="text" id="name">
+        </div>
+        <div class="form-group">
+            <label for="score">Enter score:</label>
+            <input name="score" type="number" id="score">
+        </div>
+        <div class="form-group">
+            <label for="phone_num">Enter phone number (optional):</label>
+            <input name="phone_num" type="number" id="phone_num">
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Add">
+        </div>
+    </div>
+   
+</form>
+<div class="lb-container">
+    <table border="white ridge 1px">
+        <tr class="header">
+            <th>Player no.</th>
+            <th>Name</th>
+            <th>Score</th>
+            <th>Time obtained</th>
+            <th>Action</th>
+        </tr>
+        {% for record in leaderboard %}
+            <tr>
+                <td class="id">{{ record["id"] }}</td>
+                <td class="name">{{ record["name"] }}</td>
+                <td class="score">{{ record["score"] }}</td>
+                <td class="time">{{ record["time"] }}</td>
+                <td>
+                <form method="post" action="/delete/{{ record['id'] }}">
+                    <button type="submit">Delete</button>
+                </form>
+                </td>
+            </tr>
+        {% endfor %}
+   </table>
+</div>
+<footer>
+<div class="pagination">
+    {% if page > 1 %}
+        <a href="{{ url_for('leaderboard.edit', page=page-1) }}" class="page-btn">← Prev</a>
+    {% endif %}
+    <form method="GET" action="{{ url_for('leaderboard.edit') }}">
+        <span class="page-info">
+            Page <input name="page" value="{{ page }}" type="number" min="1" max="{{ total_pages }}"> of {{ total_pages }}
+        </span>
+        <button type="submit">Go</button>
+    </form>
+
+
+    {% if page < total_pages %}
+        <a href="{{ url_for('leaderboard.edit', page=page+1) }}" class="page-btn">Next →</a>
+    {% endif %}
+</div>
+</footer>
+
+
+{% endblock body %}
