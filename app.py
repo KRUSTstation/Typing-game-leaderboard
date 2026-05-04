@@ -1,9 +1,23 @@
-from flask import Flask, render_template
+import os
+from dotenv import load_dotenv
+from flask import Flask, redirect, url_for
+import leaderboard, database
 
-app = Flask(__name__)
+load_dotenv()
 
-@app.route('/')
-def base():
-    return render_template('base.html')
+def create_app():
+   app = Flask(__name__)
+   app.config.from_prefixed_env()
 
-app.run(debug=True)
+   database.init_app(app)
+
+   app.register_blueprint(leaderboard.bp)
+
+   @app.route("/")
+   def home():
+      #whatever the home code belongs here
+      return redirect(url_for("leaderboard.view")) #change this to render template for home page lol
+
+   print(f"Current environment: {os.getenv("ENVIRONMENT")}")
+   print(f"Using Database: {app.config.get("DATABASE")}")
+   return app

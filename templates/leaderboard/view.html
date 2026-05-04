@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Makers' Leaderboard{% endblock title %}
+{% block header %}Leaderboard{% endblock header %}
+
+{% block body %}
+<div class="lb-container">
+   <table border="white ridge 1px">
+      <tr class="header">
+         <th>Name</th>
+         <th>Score</th>
+         <th>Time obtained</th>
+      </tr>
+      {% for record in leaderboard %}
+         <tr>
+            <td class="name">{{ record["name"] }}</td>
+            <td class="score">{{ record["score"] }}</td>
+            <td class="time">{{ record["time"] }}</td>
+         </tr>
+      {% endfor %}
+   </table>
+</div>
+<footer>
+<div class="pagination">
+    {% if page > 1 %}
+        <a href="{{ url_for('leaderboard.view', page=page-1) }}" class="page-btn">← Prev</a>
+    {% endif %}
+
+   <form method="GET" action="{{ url_for('leaderboard.edit') }}">
+      <span class="page-info">
+         Page <input name="page" value="{{ page }}" type="number" min="1" max="{{ total_pages }}"> of {{ total_pages }}
+      </span>
+      <button type="submit">Go</button>
+   </form>
+
+    {% if page < total_pages %}
+        <a href="{{ url_for('leaderboard.view', page=page+1) }}" class="page-btn">Next →</a>
+    {% endif %}
+</div>
+</footer>
+
+
+{% endblock body %}
+
+
