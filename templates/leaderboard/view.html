@@ -1,45 +1,51 @@
 {% extends "base.html" %}
-
-{% block title %}Makers' Leaderboard{% endblock title %}
-{% block header %}Leaderboard{% endblock header %}
+{% block title %}Leaderboard — Makers{% endblock %}
+{% block header %}Leaderboard{% endblock %}
 
 {% block body %}
-<div class="lb-container">
-   <table border="white ridge 1px">
-      <tr class="header">
-         <th>Name</th>
-         <th>Score</th>
-         <th>Time obtained</th>
-      </tr>
-      {% for record in leaderboard %}
-         <tr>
-            <td class="name">{{ record["name"] }}</td>
-            <td class="score">{{ record["score"] }}</td>
-            <td class="time">{{ record["time"] }}</td>
+<div class="rounded-2xl border border-border overflow-hidden">
+   <table class="w-full text-sm">
+      <thead>
+         <tr class="bg-surface border-b border-border text-muted text-[11px] uppercase tracking-widest">
+            <th class="px-4 py-3 text-left w-10">#</th>
+            <th class="px-4 py-3 text-left">Player</th>
+            <th class="px-4 py-3 text-right">Score</th>
+            <th class="px-4 py-3 text-right hidden sm:table-cell">Time</th>
          </tr>
-      {% endfor %}
+      </thead>
+      <tbody id="lb-body">
+         {% for record in leaderboard %}
+         <tr class="border-b border-border last:border-0 hover:bg-surface transition-colors">
+            <td class="px-4 py-3 text-muted">{{ (page-1)*10 + loop.index }}</td>
+            <td class="px-4 py-3 font-medium">{{ record["name"] }}</td>
+            <td class="px-4 py-3 text-right font-semibold tabular-nums">{{ record["score"] }}</td>
+            <td class="px-4 py-3 text-right text-muted text-xs hidden sm:table-cell">{{ record["time"] }}</td>
+         </tr>
+         {% else %}
+         <tr id="empty-row">
+            <td colspan="4" class="px-4 py-16 text-center text-muted">No entries yet~</td>
+         </tr>
+         {% endfor %}
+      </tbody>
    </table>
 </div>
-<footer>
-<div class="pagination">
-    {% if page > 1 %}
-        <a href="{{ url_for('leaderboard.view', page=page-1) }}" class="page-btn">← Prev</a>
-    {% endif %}
 
-   <form method="GET" action="{{ url_for('leaderboard.edit') }}">
-      <span class="page-info">
-         Page <input name="page" value="{{ page }}" type="number" min="1" max="{{ total_pages }}"> of {{ total_pages }}
-      </span>
-      <button type="submit">Go</button>
-   </form>
-
-    {% if page < total_pages %}
-        <a href="{{ url_for('leaderboard.view', page=page+1) }}" class="page-btn">Next →</a>
-    {% endif %}
+{% if total_pages > 1 %}
+<div class="flex items-center justify-center gap-4 mt-7 text-sm text-muted">
+   {% if page > 1 %}
+   <a href="{{ url_for('leaderboard.view', page=page-1) }}"
+      class="px-4 py-2 rounded-lg bg-surface border border-border hover:text-[#1d1d1f] transition-colors">← Prev</a>
+   {% endif %}
+   <span>{{ page }} / {{ total_pages }}</span>
+   {% if page < total_pages %} <a href="{{ url_for('leaderboard.view', page=page+1) }}"
+      class="px-4 py-2 rounded-lg bg-surface border border-border hover:text-[#1d1d1f] transition-colors">Next →</a>
+      {% endif %}
 </div>
-</footer>
+{% endif %}
 
-
-{% endblock body %}
-
-
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+   const socket = io();
+   socket.on("leaderboard_update", function (data) { window.location.reload(); });
+</script>
+{% endblock %}
