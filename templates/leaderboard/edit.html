@@ -1,87 +1,76 @@
 {% extends "base.html" %}
 {% block title %}Edit — Makers{% endblock %}
-{% block header %}Add / Edit{% endblock %}
 
 {% block body %}
+<span class="page-badge">Admin</span>
+<h1 class="page-title">Add / Edit Entries</h1>
 
-<div class="rounded-2xl border border-border bg-surface p-6 mb-8">
-    <p class="text-[11px] font-semibold uppercase tracking-widest text-muted mb-4">New Entry</p>
-    <form method="post" class="flex flex-wrap gap-3 items-end">
-        <div class="flex flex-col gap-1.5 flex-1 min-w-[130px]">
-            <label class="text-[11px] font-semibold uppercase tracking-widest text-muted">Name</label>
-            <input type="text" name="name" placeholder="Player name" required class="bg-white border border-border rounded-lg px-3 py-2 text-sm text-[#1d1d1f]
-               placeholder:text-muted focus:outline-none focus:border-accent
-               focus:ring-2 focus:ring-accent/20 transition">
-        </div>
-        <div class="flex flex-col gap-1.5 flex-1 min-w-[100px]">
-            <label class="text-[11px] font-semibold uppercase tracking-widest text-muted">Score</label>
-            <input type="number" name="score" placeholder="0" min="0" required class="bg-white border border-border rounded-lg px-3 py-2 text-sm text-[#1d1d1f]
-               placeholder:text-muted focus:outline-none focus:border-accent
-               focus:ring-2 focus:ring-accent/20 transition">
-        </div>
-        <div class="flex flex-col gap-1.5 flex-1 min-w-[150px]">
-            <label class="text-[11px] font-semibold uppercase tracking-widest text-muted">
-                Phone <span class="normal-case font-normal">(optional)</span>
-            </label>
-            <input type="text" name="phone_num" placeholder="+65 9123 4567" class="bg-white border border-border rounded-lg px-3 py-2 text-sm text-[#1d1d1f]
-               placeholder:text-muted focus:outline-none focus:border-accent
-               focus:ring-2 focus:ring-accent/20 transition">
-        </div>
-        <button type="submit" class="bg-accent text-white text-sm font-medium rounded-lg px-5 py-2
-             hover:opacity-85 transition-opacity whitespace-nowrap">
-            + Add Entry
-        </button>
-
-    </form>
+<!-- Add entry form -->
+<div class="form-card">
+  <span class="form-section-label">New Entry</span>
+  <form method="post">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="f-name">Name</label>
+        <input id="f-name" class="form-input" type="text" name="name" placeholder="Player name" required>
+      </div>
+      <div class="form-group">
+        <label for="f-score">Score</label>
+        <input id="f-score" class="form-input" type="number" name="score" placeholder="0" min="0" required>
+      </div>
+      <div class="form-group">
+        <label for="f-phone">Phone <span class="label-opt">(optional)</span></label>
+        <input id="f-phone" class="form-input" type="text" name="phone_num" placeholder="+65 9123 4567">
+      </div>
+      <button type="submit" class="btn btn-primary">+ Add Entry</button>
+    </div>
+  </form>
 </div>
 
-<div class="rounded-2xl border border-border overflow-hidden">
-    <table class="w-full text-sm">
-        <thead>
-            <tr class="bg-surface border-b border-border text-muted text-[11px] uppercase tracking-widest">
-                <th class="px-4 py-3 text-left w-10">#</th>
-                <th class="px-4 py-3 text-left">Player</th>
-                <th class="px-4 py-3 text-right">Score</th>
-                <th class="px-4 py-3 text-right hidden md:table-cell">Time</th>
-                <th class="px-4 py-3"></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for record in leaderboard %}
-            <tr class="border-b border-border last:border-0 hover:bg-surface transition-colors">
-                <td class="px-4 py-3 text-muted">{{ record["id"] }}</td>
-                <td class="px-4 py-3 font-medium">{{ record["name"] }}</td>
-                <td class="px-4 py-3 text-right font-semibold tabular-nums">{{ record["score"] }}</td>
-                <td class="px-4 py-3 text-right text-muted text-xs hidden md:table-cell">{{ record["time"] }}</td>
-                <td class="px-4 py-3 text-right">
-                    <form method="post" action="/delete/{{ record['id'] }}"
-                        onsubmit="return confirm('Remove {{ record.name }}?')">
-                        <button type="submit" class="text-danger text-xs border border-border rounded-lg px-3 py-1.5
-                     hover:bg-danger hover:text-white hover:border-danger transition-colors">
-                            Delete
-                        </button>
-                    </form>
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="5" class="px-4 py-16 text-center text-muted">No entries yet.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<!-- Records table -->
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th style="width:3rem">#</th>
+        <th>Player</th>
+        <th class="text-right">Score</th>
+        <th class="text-right hidden-sm">Time</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for record in leaderboard %}
+      <tr>
+        <td class="td-rank">{{ record["id"] }}</td>
+        <td>{{ record["name"] }}</td>
+        <td class="td-score">{{ record["score"] }}</td>
+        <td class="td-time hidden-sm">{{ record["time"] }}</td>
+        <td class="td-actions">
+          <form method="post" action="/delete/{{ record['id'] }}"
+                onsubmit="return confirm('Remove {{ record.name }}?')">
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr class="empty-row">
+        <td colspan="5">No entries yet.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 
 {% if total_pages > 1 %}
-<div class="flex items-center justify-center gap-4 mt-7 text-sm text-muted">
-    {% if page > 1 %}
-    <a href="{{ url_for('leaderboard.edit', page=page-1) }}"
-        class="px-4 py-2 rounded-lg bg-surface border border-border hover:text-[#1d1d1f] transition-colors">← Prev</a>
-    {% endif %}
-    <span>{{ page }} / {{ total_pages }}</span>
-    {% if page < total_pages %} <a href="{{ url_for('leaderboard.edit', page=page+1) }}"
-        class="px-4 py-2 rounded-lg bg-surface border border-border hover:text-[#1d1d1f] transition-colors">Next →</a>
-        {% endif %}
+<div class="pagination">
+  {% if page > 1 %}
+  <a href="{{ url_for('leaderboard.edit', page=page-1) }}" class="page-btn">← Prev</a>
+  {% endif %}
+  <span class="page-info">{{ page }} / {{ total_pages }}</span>
+  {% if page < total_pages %}
+  <a href="{{ url_for('leaderboard.edit', page=page+1) }}" class="page-btn">Next →</a>
+  {% endif %}
 </div>
 {% endif %}
 
